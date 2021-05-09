@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup as BS
 import csv
-
+urlbase ='http://books.toscrape.com'
 url ='http://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html'
 category ='poetry'
 response = requests.get(url)
@@ -16,6 +16,9 @@ if response.ok:
     productDescription = soup.find('div', id="product_description").next_sibling.next_sibling.text
     nbReview = soup.find('th', string='Number of reviews').next_sibling.next_sibling.text
     imageUrl = soup.find('div' , id="product_gallery").find('img')['src']
+    imageUrl = imageUrl[6:]
+    imageUrl = (urlbase,imageUrl)
+    imageUrl = '/'.join(imageUrl)
     with open('livre.csv', 'a', newline='') as fichiercsv:
         writer = csv.writer(fichiercsv)
         writer.writerow([url,UPC,title, PriceExcludingTax,PriceWithTax, numberAvailable, nbReview, imageUrl, productDescription,category])
