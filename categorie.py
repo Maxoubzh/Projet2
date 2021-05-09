@@ -43,13 +43,10 @@ def categoryPage(soup):
         link = link[8:]
         links.append(urlcatalogue + link)
 
-    for i in links:
-        livre(i, category, fichcsv)
 
 if response.ok:
     soup = BS(response.content, features="html.parser")
     links=[]
-    #next = soup.find('ul',{"class": "pager"}).
     next = soup.find('a',text='next')
     categoryPage(soup)
     while next :
@@ -60,3 +57,5 @@ if response.ok:
             soup = BS(response.content, features="html.parser")
             next = soup.find('a',text='next')
             categoryPage(soup)
+    for i in links:
+        livre(i, category, fichcsv)
