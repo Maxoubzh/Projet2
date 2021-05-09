@@ -5,7 +5,9 @@ import re
 
 urlbase ='http://books.toscrape.com'
 urlcatalogue ='http://books.toscrape.com/catalogue'
-url ='http://books.toscrape.com/catalogue/category/books/poetry_23/index.html'
+url = 'http://books.toscrape.com/catalogue/category/books/mystery_3/index.html'
+#url ='http://books.toscrape.com/catalogue/category/books/poetry_23/index.html'
+urlcategory = url[:len(url)-11]
 category ='poetry'
 response = requests.get(url)
 fichcsv = 'poetry.csv'
@@ -33,17 +35,28 @@ def livre(url,category,fichiercsv):
             writer.writerow([url, UPC, title, PriceExcludingTax, PriceWithTax, numberAvailable, nbReview, imageUrl,
                              productDescription, category])
 
+def categoryPage(soup):
+    divlink = soup.find_all('div', {"class": "image_container"})
+    for div in divlink:
+        a = div.find('a')
+        link = a['href']
+        link = link[8:]
+        links.append(urlcatalogue + link)
+
+    for i in links:
+        livre(i, category, fichcsv)
 
 if response.ok:
     soup = BS(response.content, features="html.parser")
     links=[]
-    divlink = soup.find_all('div', {"class": "image_container"})
-    for div in divlink :
-        a = div.find('a')
-        link= a['href']
-        link=link[8:]
-        links.append(urlcatalogue+link)
-
-    for i in links :
-        livre(i,category,fichcsv)
-
+    #next = soup.find('ul',{"class": "pager"}).
+    next = soup.find('a',text='next')
+    categoryPage(soup)
+    while next :
+        urltemp = [urlcategory,next['href']]
+        url = '/'.join(urltemp)
+        response = requests.get(url)
+        if response.ok:
+            soup = BS(response.content, features="html.parser")
+            next = soup.find('a',text='next')
+            categoryPage(soup)
