@@ -6,7 +6,7 @@ import urllib.request
 
 
 def supterm(text):
-    text = re.sub('[/:?*]', ' ', text)
+    text = re.sub('[/:?*"]', ' ', text)
     return text
 
 def livre(url,category,fichiercsv):
@@ -33,7 +33,7 @@ def livre(url,category,fichiercsv):
         numberAvailable = re.findall("\d+", numberAvailable)
         numberAvailable = numberAvailable[0]
         if soup.find('div', id="product_description"):
-            productDescription = soup.find('div', id="product_description").next_sibling.next_sibling.text
+            productDescription = soup.find('div', id="product_description").next_sibling.next_sibling.string
         else:
             productDescription =''
         nbReview = soup.find('th', string='Number of reviews').next_sibling.next_sibling.text
@@ -71,5 +71,8 @@ def category(url):
                 soup = BS(response.content, features="html.parser")
                 next = soup.find('a',text='next')
                 links = categoryPage(soup,links)
+        with open(fichcsv, 'a', newline='') as fichiercsv:
+            writer = csv.writer(fichiercsv)
+            writer.writerow(['url', 'UPC', 'titre', 'Prix sans taxe','Prix avec Taxe','Nombre disponibles', 'Note','Url de l image','Description du livre','Catégorie'])
         for i in links:
             livre(i, cat, fichcsv)
