@@ -6,7 +6,7 @@ import urllib.request
 
 
 def supterm(text):
-    text = re.sub('[/:]', ' ', text)
+    text = re.sub('[/:?*]', ' ', text)
     return text
 
 def livre(url,category,fichiercsv):
