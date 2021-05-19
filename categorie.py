@@ -3,10 +3,11 @@ from bs4 import BeautifulSoup as BS
 import csv
 import re
 import urllib.request
+import os
 
 
 def supterm(text):
-    text = re.sub('[/:?*"]', ' ', text)
+    text = re.sub('[/:?*"<>|]', ' ', text)
     return text
 
 
@@ -23,6 +24,8 @@ def livre(url,category,fichiercsv):
         nomImage = supterm(nomImage)
         nomImage = (nomImage, 'jpg')
         nomImage = '.'.join(nomImage)
+        nomImage = (category,nomImage)
+        nomImage = '/'.join(nomImage)
         urllib.request.urlretrieve(imageUrl, nomImage)
         title = soup.find('li',{'class':'active'}).text
         tableau = soup.select('article td')
@@ -75,6 +78,8 @@ def category(url):
         with open(fichcsv, 'a', newline='') as fichiercsv:
             writer = csv.writer(fichiercsv)
             writer.writerow(['url', 'UPC', 'titre', 'Prix sans taxe','Prix avec Taxe','Nombre disponibles', 'Note','Url de l image','Description du livre','Catégorie'])
+        if not os.path.exists(cat):
+            os.makedirs(cat)
         for i in links:
             livre(i, cat, fichcsv)
         return cat
