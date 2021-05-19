@@ -10,11 +10,6 @@ def supterm(text):
     return text
 
 
-def supterm2(text):
-    text = re.sub('[‽]', ' ', text)
-    return text
-
-
 def livre(url,category,fichiercsv):
     urlbase = 'http://books.toscrape.com'
     response = requests.get(url)
@@ -39,7 +34,7 @@ def livre(url,category,fichiercsv):
         numberAvailable = numberAvailable[0]
         if soup.find('div', id="product_description"):
             productDescription = soup.select_one('article > p').text
-            productDescription = supterm2(productDescription)
+            productDescription = re.sub('\W+', '', productDescription)
         else:
             productDescription =''
         nbReview = tableau[6].text
@@ -82,6 +77,7 @@ def category(url):
             writer.writerow(['url', 'UPC', 'titre', 'Prix sans taxe','Prix avec Taxe','Nombre disponibles', 'Note','Url de l image','Description du livre','Catégorie'])
         for i in links:
             livre(i, cat, fichcsv)
+        return cat
 
 
 def impsite()  :
@@ -103,5 +99,5 @@ def impsite()  :
     while i < len(linkCat):
             urlcategorie = linksCat[i]
             i += 1
-            print(urlcategorie)
-            category(urlcategorie)
+            categorie = category(urlcategorie)
+            print(categorie)

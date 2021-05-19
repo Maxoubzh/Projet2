@@ -34,7 +34,7 @@ def choix() :
             print("Merci d'avoir utiliser notre logiciel, au revoir")
         elif choix == '3' :
             print("Traitrment en cours, attention le traitement peux être long")
-            print("Le nombre de catégories traitées va s'afficher durant le traitement")
+            print("Le nom des catégories traitées va s'afficher durant le traitement")
             categorie.impsite()
             print("Vous allez maintenant retrouver les informations dans différents fichiers aux noms des catégories")
             print("Merci d'avoir utiliser notre logiciel, au revoir")
