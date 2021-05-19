@@ -9,6 +9,12 @@ def supterm(text):
     text = re.sub('[/:?*"]', ' ', text)
     return text
 
+
+def supterm2(text):
+    text = re.sub('[‽]', ' ', text)
+    return text
+
+
 def livre(url,category,fichiercsv):
     urlbase = 'http://books.toscrape.com'
     response = requests.get(url)
@@ -19,27 +25,27 @@ def livre(url,category,fichiercsv):
         imageUrl = (urlbase, imageUrl)
         imageUrl = '/'.join(imageUrl)
         nomImage = soup.find('div', id="product_gallery").find('img')['alt']
-        if len(nomImage)>20:
-            nomImage = nomImage[:19]
         nomImage = supterm(nomImage)
         nomImage = (nomImage, 'jpg')
         nomImage = '.'.join(nomImage)
         urllib.request.urlretrieve(imageUrl, nomImage)
         title = soup.find('li',{'class':'active'}).text
-        UPC = soup.find('th', string='UPC').next_sibling.text
-        PriceWithTax = soup.find('th', string='Price (incl. tax)').next_sibling.text
-        PriceExcludingTax = soup.find('th', string='Price (excl. tax)').next_sibling.text
-        numberAvailable = soup.find('th', string='Availability').next_sibling.next_sibling.text
+        tableau = soup.select('article td')
+        UPC = tableau[0].text
+        PriceWithTax = tableau[3].text
+        PriceExcludingTax = tableau[2].text
+        numberAvailable = tableau[5].text
         numberAvailable = re.findall("\d+", numberAvailable)
         numberAvailable = numberAvailable[0]
         if soup.find('div', id="product_description"):
-            productDescription = soup.find('div', id="product_description").next_sibling.next_sibling.string
+            productDescription = soup.select_one('article > p').text
+            productDescription = supterm2(productDescription)
         else:
             productDescription =''
-        nbReview = soup.find('th', string='Number of reviews').next_sibling.next_sibling.text
+        nbReview = tableau[6].text
         with open(fichiercsv, 'a', newline='') as fichiercsv:
             writer = csv.writer(fichiercsv)
-            writer.writerow([url, UPC, title, PriceExcludingTax, PriceWithTax, numberAvailable, nbReview, imageUrl,productDescription.encode('utf8'), category])
+            writer.writerow([url, UPC, title, PriceExcludingTax, PriceWithTax, numberAvailable, nbReview, imageUrl,productDescription, category])
 
 
 def categoryPage(soup,links):
@@ -76,3 +82,26 @@ def category(url):
             writer.writerow(['url', 'UPC', 'titre', 'Prix sans taxe','Prix avec Taxe','Nombre disponibles', 'Note','Url de l image','Description du livre','Catégorie'])
         for i in links:
             livre(i, cat, fichcsv)
+
+
+def impsite()  :
+    urlbase = 'http://books.toscrape.com'
+
+    response = requests.get(urlbase)
+
+    if response.ok:
+        soup = BS(response.content, features="html.parser")
+    urlbase = 'http://books.toscrape.com'
+    linksCat = []
+    divCat = soup.find('div', {"class": "side_categories"}).find_all('li')
+    for i in divCat:
+        a = i.find('a')
+        linkCat = a['href']
+        linksCat.append(urlbase + '/' + linkCat)
+
+    i=1
+    while i < len(linkCat):
+            urlcategorie = linksCat[i]
+            i += 1
+            print(urlcategorie)
+            category(urlcategorie)
