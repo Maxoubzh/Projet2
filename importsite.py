@@ -33,7 +33,7 @@ def choix() :
             print ("Vous allez maintenant retrouver les informations dans un fichier au nom de la catégorie")
             print("Merci d'avoir utiliser notre logiciel, au revoir")
         elif choix == '3' :
-            print("Traitrment en cours, attention le traitement peux être long")
+            print("Traitement en cours, attention le traitement peux être long")
             print("Le nom des catégories traitées va s'afficher durant le traitement")
             categorie.impsite()
             print("Vous allez maintenant retrouver les informations dans différents fichiers aux noms des catégories")
@@ -47,4 +47,7 @@ def choix() :
 
 if __name__ == '__main__':
     print("Bonjour, à l'aide de ce programme, vous pouvez télécharger les informations d'un livre en particulier, de toute une section ou bien le site en entier")
-    choix()
+    try:
+        choix()
+    except:
+        print("Une erreur a eu lieu lors du l'execution du programme")

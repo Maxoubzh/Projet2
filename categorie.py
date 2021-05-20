@@ -5,7 +5,6 @@ import re
 import urllib.request
 import os
 
-
 def supterm(text):
     text = re.sub('[/:?*"<>|]', ' ', text)
     return text
@@ -22,7 +21,9 @@ def livre(url,category,fichiercsv):
         imageUrl = '/'.join(imageUrl)
         nomImage = soup.find('div', id="product_gallery").find('img')['alt']
         nomImage = supterm(nomImage)
-        nomImage = (nomImage, 'jpg')
+        if len(nomImage)>150:
+            nomImage=nomImage[:150]
+        nomImage =[nomImage,'jpg']
         nomImage = '.'.join(nomImage)
         nomImage = (category,nomImage)
         nomImage = '/'.join(nomImage)
@@ -37,11 +38,10 @@ def livre(url,category,fichiercsv):
         numberAvailable = numberAvailable[0]
         if soup.find('div', id="product_description"):
             productDescription = soup.select_one('article > p').text
-            productDescription = re.sub('\W+', '', productDescription)
         else:
             productDescription =''
         nbReview = tableau[6].text
-        with open(fichiercsv, 'a', newline='') as fichiercsv:
+        with open(fichiercsv, 'a', newline='', encoding='utf-8') as fichiercsv:
             writer = csv.writer(fichiercsv)
             writer.writerow([url, UPC, title, PriceExcludingTax, PriceWithTax, numberAvailable, nbReview, imageUrl,productDescription, category])
 
@@ -75,7 +75,7 @@ def category(url):
                 soup = BS(response.content, features="html.parser")
                 next = soup.find('a',text='next')
                 links = categoryPage(soup,links)
-        with open(fichcsv, 'a', newline='') as fichiercsv:
+        with open(fichcsv,  'a', newline='', encoding='utf-8') as fichiercsv:
             writer = csv.writer(fichiercsv)
             writer.writerow(['url', 'UPC', 'titre', 'Prix sans taxe','Prix avec Taxe','Nombre disponibles', 'Note','Url de l image','Description du livre','Catégorie'])
         if not os.path.exists(cat):
